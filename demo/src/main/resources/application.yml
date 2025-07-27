@@ -1,0 +1,27 @@
+spring:
+#  profiles:
+#    active: mysql
+  application:
+    name: demo
+  threads:
+    virtual:
+      enabled: true
+  datasource:
+    url: ${DB_URL:localhost}${DB_PORT:3306}
+    username: ${LOCAL_USERNAME:exemplo}
+    password: ${LOCAL_PASSWORD:exemplo}
+logging:
+  level:
+     com.example.demo: debug
+server:
+  servlet:
+    context-path: /
+  error:
+    include-stacktrace: ON_PARAM
+  tomcat:
+   threads:
+     max: 20
+
+
+
+

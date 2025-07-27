@@ -1,0 +1,8 @@
+spring:
+  datasource:
+    url: localhost:9999
+    username: texte
+    password: test
+
+
+
