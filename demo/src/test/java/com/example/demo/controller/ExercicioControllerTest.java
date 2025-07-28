@@ -163,20 +163,47 @@ class ExercicioControllerTest {
                 .andDo(MockMvcResultHandlers.print())
                 .andExpect(MockMvcResultMatchers.status().isBadRequest())
                 .andReturn();
-        var resolvedException= mvcResult.getResolvedException();
+        var resolvedException = mvcResult.getResolvedException();
         Assertions.assertThat(resolvedException).isNotNull();
         Assertions.assertThat(resolvedException.getMessage()).contains(errors);
     }
 
-    private static Stream<Arguments> saveInvalidation() {
-        var s = dsds();
+   @ParameterizedTest
+   @MethodSource("putInvalidation")
+        void putBadRequest(String fileName, List<String> errors) throws Exception {
+        BDDMockito.when(exercicioData.lista()).thenReturn(exercicios);
+        String resoul = resoul("Exercicio/%s".formatted(fileName));
+        var mvcResult = mvcTest.perform(MockMvcRequestBuilders.put("/v1/exercicios")
+                        .content(resoul)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andDo(MockMvcResultHandlers.print())
+                .andExpect(MockMvcResultMatchers.status().isBadRequest())
+                .andReturn();
+
+        var resolvedException = mvcResult.getResolvedException();
+        Assertions.assertThat(resolvedException).isNotNull();
+        Assertions.assertThat(resolvedException.getMessage()).contains(errors);
+    }
+    private static Stream<Arguments>putInvalidation() {
+        var allRequiredErrors = allRequiredErrors();
+        allRequiredErrors.add("The field 'id' cannot be null");
         return Stream.of(
-                Arguments.of("post-request-blank-400.json",s)
+                Arguments.of("put-request-blank-fields-400.json",allRequiredErrors),
+                Arguments.of("put-request-empty-fields-400.json",allRequiredErrors)
         );
     }
-    private static List<String>dsds(){
+
+    private static Stream<Arguments> saveInvalidation() {
+        var allRequiredErrors = allRequiredErrors();
+        return Stream.of(
+                Arguments.of("post-request-blank-fields-400.json", allRequiredErrors),
+                Arguments.of("post-request-empy-400.json", allRequiredErrors)
+        );
+    }
+
+    private static List<String> allRequiredErrors() {
         var nameInvalid = "The field 'name' is required";
-        return List.of(nameInvalid);
+        return new ArrayList<>(List.of(nameInvalid));
     }
 
     private String resoul(String fileName) throws IOException {
