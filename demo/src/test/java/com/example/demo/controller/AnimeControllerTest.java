@@ -5,8 +5,12 @@ import com.example.demo.commons.FilesUtils;
 import com.example.demo.domain.Anime;
 import com.example.demo.repository.AnimeData;
 import com.example.demo.repository.AnimeHardCodedRepository;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.ArgumentMatchers;
 import org.mockito.BDDMockito;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,7 +24,9 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Stream;
 
 @WebMvcTest(controllers = AnimeController.class)
 @ComponentScan(basePackages = "com.example.demo")
@@ -126,7 +132,7 @@ class AnimeControllerTest {
     void save() throws Exception {
         String s = filesUtils.readResouserfile
 
-                ("animes/pos-request-animes-ok-200.json");
+                ("animes/pos-request-animes-ok-fields-200.json");
         String s1 = filesUtils.readResouserfile
 
                 ("animes/post-response-animes-ok-201.json");
@@ -167,6 +173,56 @@ class AnimeControllerTest {
                 .andDo(MockMvcResultHandlers.print())
                 .andExpect(MockMvcResultMatchers.status().isNotFound());
     }
-
+    @ParameterizedTest
+    @MethodSource("postinvalidation")
+    void saveBadRequest(String fileName, List<String>errors) throws Exception {
+        String s = filesUtils.readResouserfile
+                ("animes/%s".formatted(fileName));
+        var build = animeUtils.newAnimeToSave();
+        BDDMockito.when(repository.save(ArgumentMatchers.any())).thenReturn(build);
+        var mvcResult =mockMvc.perform(MockMvcRequestBuilders
+                        .post(URL)
+                        .content(s)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andDo(MockMvcResultHandlers.print())
+                .andExpect(MockMvcResultMatchers.status().isBadRequest())
+                .andReturn();
+       var resolvedException= mvcResult.getResolvedException();
+       Assertions.assertThat(resolvedException).isNotNull();
+       Assertions.assertThat(resolvedException.getMessage()).contains(errors);
+    }
+    @ParameterizedTest
+    @MethodSource("putinvalidation")
+    void putBadRequest(String fileName,List<String>errors) throws Exception {
+        BDDMockito.when(animeData.getAnimes()).thenReturn(list);
+        String s = filesUtils.readResouserfile("animes/%s".formatted(fileName));
+        var mvcResult = mockMvc.perform(MockMvcRequestBuilders.put(URL)
+                        .content(s)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andDo(MockMvcResultHandlers.print())
+                .andExpect(MockMvcResultMatchers.status().isBadRequest())
+                .andReturn();
+        var resolvedException = mvcResult.getResolvedException();
+        Assertions.assertThat(resolvedException).isNotNull();
+        Assertions.assertThat(resolvedException.getMessage()).contains(errors);
+    }
+    private static List<String>invalidationEr(){
+        var erro = "The field 'name' is required";
+       return new ArrayList<>(List.of(erro));
+    }
+    private static Stream<Arguments>postinvalidation(){
+        var invalidationEr = invalidationEr();
+        return Stream.of(
+                Arguments.of("post-request-blank-fields-400.json",invalidationEr),
+                Arguments.of("post-request-empty-fields-400.json",invalidationEr)
+        );
+    }
+    private static Stream<Arguments>putinvalidation(){
+        var invalidationEr = invalidationEr();
+        invalidationEr.add("The field 'id' cannot be null");
+        return Stream.of(
+                Arguments.of("put-animes-blank-fields-400.json",invalidationEr),
+                Arguments.of("put-animes-empty-fields-400.json",invalidationEr));
+    }
 
 }
