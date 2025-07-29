@@ -108,10 +108,11 @@ class ProducerControllerTest {
     void findById_ThrowsResponseStatusException_WhenProducerIsNotfound() throws Exception {
         BDDMockito.when(producerData.getProducers()).thenReturn(producersList);
         var id = 99L;
+        var response = filesUtils.readResouserfile("producer/get-producer-by-id-404.json");
         mockMvc.perform(MockMvcRequestBuilders.get(URL + "/{id}", id))
                 .andDo(MockMvcResultHandlers.print())
                 .andExpect(MockMvcResultMatchers.status().isNotFound())
-                .andExpect(MockMvcResultMatchers.status().reason("Producer not Found"));
+                .andExpect(MockMvcResultMatchers.content().json(response));
     }
 
     @Test
@@ -155,6 +156,7 @@ class ProducerControllerTest {
     void update_ThrowsResponseStatusException_WhenProducerIsNotFound() throws Exception {
         BDDMockito.when(producerData.getProducers()).thenReturn(producersList);
         var request = filesUtils.readResouserfile("producer/put-request-producer-404.json");
+        var response = filesUtils.readResouserfile("producer/update-producer-by-id-404.json");
         mockMvc.perform(MockMvcRequestBuilders
                         .put(URL)
                         .content(request)
@@ -162,7 +164,7 @@ class ProducerControllerTest {
                 )
                 .andDo(MockMvcResultHandlers.print())
                 .andExpect(MockMvcResultMatchers.status().isNotFound())
-                .andExpect(MockMvcResultMatchers.status().reason("Producer not Found"));
+                .andExpect(MockMvcResultMatchers.content().json(response));
     }
 
 
@@ -184,12 +186,12 @@ class ProducerControllerTest {
     void delete_ThrowsResponseStatusException_WhenProducerIsNotFound() throws Exception {
         BDDMockito.when(producerData.getProducers()).thenReturn(producersList);
         var id = 99;
+        var response = filesUtils.readResouserfile("producer/delete-producer-by-id-404.json");
         mockMvc.perform(MockMvcRequestBuilders.delete(URL + "/{id}", id)
                 )
                 .andDo(MockMvcResultHandlers.print())
                 .andExpect(MockMvcResultMatchers.status().isNotFound())
-                .andExpect(MockMvcResultMatchers.status().reason("Producer not Found"));
-
+                .andExpect(MockMvcResultMatchers.content().json(response));
     }
     @ParameterizedTest
     @MethodSource("putProducerBadRequestSource")
@@ -213,7 +215,7 @@ class ProducerControllerTest {
 
     @ParameterizedTest
     @MethodSource("postUserProducerRequestSource")
-    @DisplayName("POST v1/producers returns bad request when fields are invalid")
+    @DisplayName("POST v1/producers rgit eturns bad request when fields are invalid")
     @Order(12)
     void save_ReturnsBadRequest_WhenFieldsAreInvalid(String fileName, List<String> errors) throws Exception {
         var request = filesUtils.readResouserfile("producer/%s".formatted(fileName));

@@ -1,6 +1,7 @@
 package com.example.demo.service;
 
 import com.example.demo.domain.Anime;
+import com.example.demo.exception.NotFoundException;
 import com.example.demo.repository.AnimeHardCodedRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -17,7 +18,7 @@ public class AnimeService {
        return name == null ?repository.findAll(): repository.findByName(name);
     }
     public Anime findByIdOrElseTrow(Long id){
-      return repository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,"Producer not Found"));
+      return repository.findById(id).orElseThrow(() -> new NotFoundException("Anime not found"));
     }
     public Anime save(Anime anime){
        return repository.save(anime);

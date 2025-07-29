@@ -90,9 +90,7 @@ class AnimeControllerTest {
     @Test
     void hindByIdSucess() throws Exception {
         BDDMockito.when(animeData.getAnimes()).thenReturn(list);
-        String s = filesUtils.readResouserfile
-
-                ("animes/get-animes-by-id-200.json");
+        String s = filesUtils.readResouserfile("animes/get-animes-by-id-200.json");
         var id = 1L;
         mockMvc.perform(MockMvcRequestBuilders.get(URL + "/{id}", id))
                 .andDo(MockMvcResultHandlers.print())
@@ -104,9 +102,12 @@ class AnimeControllerTest {
     void hindByIdNotSucess() throws Exception {
         BDDMockito.when(animeData.getAnimes()).thenReturn(list);
         var id = 99L;
+        String s = filesUtils.readResouserfile("animes/get-animes-id-404.json");
         mockMvc.perform(MockMvcRequestBuilders.get(URL + "/{id}", id))
                 .andDo(MockMvcResultHandlers.print())
-                .andExpect(MockMvcResultMatchers.status().isNotFound());
+                .andExpect(MockMvcResultMatchers.status().isNotFound())
+                .andExpect(MockMvcResultMatchers.content().json(s));
+
     }
 
     @Test
@@ -122,10 +123,11 @@ class AnimeControllerTest {
     void delete_RemoveProducer_WhenNotSuccessful() throws Exception {
         BDDMockito.when(animeData.getAnimes()).thenReturn(list);
         var id = 99L;
+        String s = filesUtils.readResouserfile("animes/delete-animes-id-404.json");
         mockMvc.perform(MockMvcRequestBuilders.delete(URL + "/{id}", id))
                 .andDo(MockMvcResultHandlers.print())
                 .andExpect(MockMvcResultMatchers.status().isNotFound())
-                .andExpect(MockMvcResultMatchers.status().reason("Producer not Found"));
+                .andExpect(MockMvcResultMatchers.content().json(s));
     }
 
     @Test
@@ -150,10 +152,7 @@ class AnimeControllerTest {
     @Test
     void update() throws Exception {
         BDDMockito.when(animeData.getAnimes()).thenReturn(list);
-        String s = filesUtils.readResouserfile
-
-                ("animes/put-animes-by-id-200.json");
-
+        String s = filesUtils.readResouserfile("animes/put-animes-by-id-200.json");
         mockMvc.perform(MockMvcRequestBuilders.put(URL)
                         .content(s)
                         .contentType(MediaType.APPLICATION_JSON))
@@ -164,14 +163,14 @@ class AnimeControllerTest {
     @Test
     void Notupdate() throws Exception {
         BDDMockito.when(animeData.getAnimes()).thenReturn(list);
-        String s = filesUtils.readResouserfile
-
-                ("Exercicio/put-request-exercicio-404.json");
+        String s = filesUtils.readResouserfile("Exercicio/put-request-exercicio-404.json");
+        String a = filesUtils.readResouserfile("animes/update-animes-id-404.json");
         mockMvc.perform(MockMvcRequestBuilders.put(URL)
                         .content(s)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andDo(MockMvcResultHandlers.print())
-                .andExpect(MockMvcResultMatchers.status().isNotFound());
+                .andExpect(MockMvcResultMatchers.status().isNotFound())
+                .andExpect(MockMvcResultMatchers.content().json(a));
     }
     @ParameterizedTest
     @MethodSource("postinvalidation")

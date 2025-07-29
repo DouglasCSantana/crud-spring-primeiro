@@ -1,6 +1,7 @@
 package com.example.demo.service;
 
 import com.example.demo.domain.Producer;
+import com.example.demo.exception.NotFoundException;
 import com.example.demo.repository.ProducerHardCodedRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -17,7 +18,7 @@ public class ProducerService {
         return name == null? repository.findyAll(): repository.findyByName(name);
     }
     public Producer findyByIdOrElseThrow(Long id){
-      return repository.findyById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,"Producer not Found"));
+      return repository.findyById(id).orElseThrow(() -> new NotFoundException("Producer not found"));
     }
     public Producer save(Producer producer){
         return repository.save(producer);

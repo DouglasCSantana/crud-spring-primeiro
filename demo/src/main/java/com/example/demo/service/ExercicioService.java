@@ -1,6 +1,7 @@
 package com.example.demo.service;
 
 import com.example.demo.domain.Exercicio;
+import com.example.demo.exception.NotFoundException;
 import com.example.demo.repository.ExecicioHardRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -19,7 +20,7 @@ public class ExercicioService {
         return name == null ? repository.listALl() : repository.findByName(name);
     }
     public Exercicio findByIdTrows(Long id) {
-        return repository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+        return repository.findById(id).orElseThrow(() -> new NotFoundException("Exercicio Not Found"));
     }
 
     public Exercicio save(Exercicio exercicio) {

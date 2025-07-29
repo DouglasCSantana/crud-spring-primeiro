@@ -97,9 +97,11 @@ class ExercicioControllerTest {
     void findByIdNotSucess() throws Exception {
         BDDMockito.when(exercicioData.lista()).thenReturn(exercicios);
         var id = 99L;
+        String request = resoul("Exercicio/get-exercicio-by-id-404.json");
         mvcTest.perform(MockMvcRequestBuilders.get("/v1/exercicios/{id}", id))
                 .andDo(MockMvcResultHandlers.print())
-                .andExpect(MockMvcResultMatchers.status().isNotFound());
+                .andExpect(MockMvcResultMatchers.status().isNotFound())
+                .andExpect(MockMvcResultMatchers.content().json(request));
     }
 
     @Test
@@ -115,9 +117,11 @@ class ExercicioControllerTest {
     void deleteNotSucess() throws Exception {
         BDDMockito.when(exercicioData.lista()).thenReturn(exercicios);
         var id = 99L;
+        String request = resoul("Exercicio/delete-exercicio-by-id-404.json");
         mvcTest.perform(MockMvcRequestBuilders.delete("/v1/exercicios/{id}", id))
                 .andDo(MockMvcResultHandlers.print())
-                .andExpect(MockMvcResultMatchers.status().isNotFound());
+                .andExpect(MockMvcResultMatchers.status().isNotFound())
+                .andExpect(MockMvcResultMatchers.content().json(request));
     }
 
     @Test
@@ -133,9 +137,12 @@ class ExercicioControllerTest {
     void updateNotSucess() throws Exception {
         BDDMockito.when(exercicioData.lista()).thenReturn(exercicios);
         String resoul = resoul("Exercicio/put-request-exercicio-404.json");
+        String request = resoul("Exercicio/put-exercicio-by-id-404.json");
         mvcTest.perform(MockMvcRequestBuilders.put("/v1/exercicios").content(resoul).contentType(MediaType.APPLICATION_JSON))
                 .andDo(MockMvcResultHandlers.print())
-                .andExpect(MockMvcResultMatchers.status().isNotFound());
+                .andExpect(MockMvcResultMatchers.status().isNotFound())
+                .andExpect(MockMvcResultMatchers.content().json(request));
+
     }
 
     @Test
