@@ -1,15 +1,21 @@
 package com.example.demo.domain;
 
+import jakarta.persistence.*;
 import lombok.*;
 
 @ToString
 @Builder
 @Setter
 @Getter
+@Entity
+@NoArgsConstructor
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public class Anime {
     @EqualsAndHashCode.Include
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    @Column(nullable = false)
     private String name;
 
 

@@ -1,27 +1,37 @@
 spring:
 #  profiles:
 #    active: mysql
+  config:
+    import: optional:classpath:.env[.properties]
   application:
-    name: demo
+    name: user-service
+  datasource:
+    url: jdbc:mysql://localhost:3306/user_service?useTimezone=true&serverTimezone=UTC&createDatabaseIfNotExist=true
+    username: ${ENV_ROOT_USER:root}
+    password: ${ENV_ROOT_PASSWORD:java}
+  jpa:
+    show-sql: true
+    hibernate:
+      ddl-auto: update
   threads:
     virtual:
       enabled: true
-  datasource:
-    url: ${DB_URL:localhost}${DB_PORT:3306}
-    username: ${LOCAL_USERNAME:exemplo}
-    password: ${LOCAL_PASSWORD:exemplo}
+
 logging:
   level:
-     com.example.demo: debug
+    academy.devdojo: debug
 server:
+  port: 8090
   servlet:
     context-path: /
+
   error:
-    include-stacktrace: ON_PARAM
+    include-stacktrace: on_param
   tomcat:
-   threads:
-     max: 20
-
-
-
+    threads:
+      max: 20
+#database:
+#  url: ${DB_URL:localhost}${DB_PORT:3306}
+#  username: ${LOCAL_USERNAME:exemplo}
+#  password: ${LOCAL_PASSWORD:exemplo}
 
